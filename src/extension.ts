@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import CSConfig from './config';
-import { fetchCodeCompletionTexts, fetchCodeCompletionTextsFaux } from './utils/fetchCodeCompletions';
+import { fetchLineCompletionTexts} from './utils/fetchCodeCompletions';
 
 export function activate(context: vscode.ExtensionContext) {
 	const disposable = vscode.commands.registerCommand(
@@ -18,11 +18,10 @@ export function activate(context: vscode.ExtensionContext) {
 		provideInlineCompletionItems: async (document, position, context, token) => {
 			// Grab the api key from the extension's config
 			const configuration = vscode.workspace.getConfiguration('', document.uri);
-			const USE_FAUXPILOT = configuration.get("conf.resource.useFauxPilot", false);
-			// if (!USE_FAUXPILOT) {
-			const MODEL_NAME = configuration.get("conf.resource.hfModelName", "");
-			const API_KEY = configuration.get("conf.resource.hfAPIKey", "");
-			const USE_GPU = configuration.get("conf.resource.useGPU", false);
+
+			const BOOK_ID = configuration.get("conf.resource.bookID", "");
+			const API_BASE = configuration.get("conf.resource.bookAPIBase", "");
+			const API_KEY = configuration.get("conf.resource.bookAPIKey", "");
 			// }
 
 			// vscode.comments.createCommentController
@@ -35,40 +34,29 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 
 			// Check if user's state meets one of the trigger criteria
-			if (CSConfig.SEARCH_PHARSE_END.includes(textBeforeCursor[textBeforeCursor.length - 1]) || currLineBeforeCursor.trim() === "") {
-				let rs;
+			if (CSConfig.SEARCH_PHARSE_END.includes(textBeforeCursor.slice(-2)) || currLineBeforeCursor.trim() === "") {
+				let rs = null;
 
-				if (USE_FAUXPILOT) {
-					try {
-						// Fetch the code completion based on the text in the user's document
-						rs = await fetchCodeCompletionTextsFaux(textBeforeCursor);
-					} catch (err) {
-	
-						if (err instanceof Error) {
-							vscode.window.showErrorMessage(err.toString());
+				try {
+					// 这里需要做一个更好的截断
+					for (let i = currLineBeforeCursor.length - 1; i >= 0; i--) {
+						if (CSConfig.SERACH_CHINESE_END.includes(currLineBeforeCursor[i])) {
+							rs = await fetchLineCompletionTexts(currLineBeforeCursor.slice(i, -2), API_BASE, API_KEY, BOOK_ID);
+							break;
 						}
-						return { items: [] };
 					}
-				}
 
-				else {	
-					try {
-						// Fetch the code completion based on the text in the user's document
-						rs = await fetchCodeCompletionTexts(textBeforeCursor, document.fileName, MODEL_NAME, API_KEY, USE_GPU);
-					} catch (err) {
-
-						if (err instanceof Error) {
-							// Check if it is an issue with API token and if so prompt user to enter a correct one
-							if (err.toString() === "Error: Bearer token is invalid" || err.toString() === "Error: Authorization header is invalid, use 'Bearer API_TOKEN'") {
-								vscode.window.showInputBox(
-									{ "prompt": "Please enter your HF API key in order to use Code Clippy", "password": true }
-								).then(apiKey => configuration.update("conf.resource.hfAPIKey", apiKey));
-
-							}
-							vscode.window.showErrorMessage(err.toString());
-						}
-						return { items: [] };
+					if (rs == null) {
+						rs = await fetchLineCompletionTexts(currLineBeforeCursor.slice(0, -2), API_BASE, API_KEY, BOOK_ID);
 					}
+
+					// rs = await fetchLineCompletionTexts(textBeforeCursor, API_BASE, API_KEY, BOOK_ID);
+				} catch (err) {
+
+					if (err instanceof Error) {
+						vscode.window.showErrorMessage(err.toString());
+					}
+					return { items: [] };
 				}
 
 				if (rs == null) {

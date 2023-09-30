@@ -1,15 +1,15 @@
 {
-	"name": "code-clippy",
-	"displayName": "Code Clippy",
-	"description": "Your friendly neighborhood Clippy, ready to help you with all your code needs :D!",
+	"name": "linepilot",
+	"displayName": "Line Pilot",
+	"description": "Line Pilot is a VS Code extension that helps you find the right line snippet from the book you want.",
 	"version": "0.0.1",
-	"publisher": "ncoop57",
-	"icon": "code_clippy_logo.jpg",
-	"repository": "https://github.com/ncoop57/gpt-code-clippy/",
+	"publisher": "jingfelix",
+	"icon": "line_pilot_logo.png",
+	"repository": "https://github.com/jingfelix/LinePilot",
 	"engines": {
-		"vscode": "^1.34.0"
+		"vscode": "^1.82.2"
 	},
-	"license": "MIT",
+	"license": "Apache-2.0",
 	"categories": [
 		"Other"
 	],
@@ -21,34 +21,26 @@
 		"commands": [
 			{
 				"command": "extension.code-clippy-settings",
-				"title": "Code Clippy Settings"
+				"title": "Line Pilot Settings"
 			}
 		],
 		"configuration": {
-			"title": "Code Clippy Configuration",
+			"title": "Line Pilot Configuration",
 			"properties": {
-				"conf.resource.useFauxPilot": {
-					"type": "boolean",
-					"default": false,
-					"description": "Whether to use Faux Pilo: https://github.com/moyix/fauxpilot",
-					"scope": "resource"
-				},
-				"conf.resource.hfModelName": {
+				"conf.resource.bookID": {
 					"type": "string",
-					"default": "flax-community/gpt-neo-125M-code-clippy-dedup-2048",
-					"description": "Model name that will be used to generate the completions.",
+					"default": "<BOOK_ID>",
+					"description": "BOOK_ID of the book to search for",
 					"scope": "resource"
-				},
-				"conf.resource.hfAPIKey": {
+				},"conf.resource.bookAPIBase": {
+					"type": "string",
+					"default": "http://localhost:5050",
+					"description": "API Base for EasySearch",
+					"scope": "resource"
+				},"conf.resource.bookAPIKey": {
 					"type": "string",
 					"default": "<API_KEY>",
-					"description": "API key for using Huggingface's Inference API: https://api-inference.huggingface.co/docs/node/html/quicktour.html",
-					"scope": "resource"
-				},
-				"conf.resource.useGPU": {
-					"type": "boolean",
-					"default": false,
-					"description": "Whether to use GPU for faster completions. Must have Startup plan at a minimum.",
+					"description": "API key for EasySearch",
 					"scope": "resource"
 				}
 			}
@@ -80,7 +72,6 @@
 	"dependencies": {
 		"@types/jsdom": "^16.2.12",
 		"jsdom": "^16.6.0",
-		"node-fetch": "^2.6.1",
-		"openai": "^3.0.0"
+		"node-fetch": "^2.6.1"
 	}
 }
