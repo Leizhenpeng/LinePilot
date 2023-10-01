@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import { URL } from "url";
 // import * as openai from 'openai';
 
 export type FetchCodeCompletions = {
@@ -30,8 +31,7 @@ export function fetchLineCompletionTexts(prompt: string, API_BASE: string, API_K
                                 ""
                             );
                             continue;
-                        };
-
+                        }
                         const prmptIndex = completion.indexOf(prompt);
                         if (prmptIndex !== -1) {
                             completions.push(
@@ -54,7 +54,7 @@ export function fetchLineCompletionTexts(prompt: string, API_BASE: string, API_K
                 }
             })
             .catch(err => reject(err));
-    })
+    });
 }
 
 

@@ -3,17 +3,22 @@
 ## Usage
 
 - 安装需要的包
-    ```bash
-    npm install
-    ```
+
+  ```bash
+  npm install
+  npm install vsce -g
+  ```
+
 - 使用 `vsce` 进行打包
 
-    ```bash
-    vsce package
-    ```
+  ```bash
+  vsce package
+  ```
 
 - 直接从 VSCode 中安装 `vsix` 文件
+
 - 在插件设置中，填写 EasySearch 服务器的地址和 BOOK_ID（API_KEY 暂时不用设置）
+
 - 在文件中使用 `++` 触发补全
 
 ## Logic
