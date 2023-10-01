@@ -12,18 +12,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 
-	const provider: vscode.CompletionItemProvider = {
+	const provider: vscode.InlineCompletionItemProvider = {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
 		provideInlineCompletionItems: async (document, position, context, token) => {
-			// Grab the api key from the extension's config
 			const configuration = vscode.workspace.getConfiguration('', document.uri);
-
 			const BOOK_ID = configuration.get("conf.resource.bookID", "");
 			const API_BASE = configuration.get("conf.resource.bookAPIBase", "");
 			const API_KEY = configuration.get("conf.resource.bookAPIKey", "");
-			// }
-
+    
 			// vscode.comments.createCommentController
 			const textBeforeCursor = document.getText();
 			if (textBeforeCursor.trim() === "") {
@@ -34,20 +31,20 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 
 			// Check if user's state meets one of the trigger criteria
-			if (CSConfig.SEARCH_PHARSE_END.includes(textBeforeCursor.slice(-2)) || currLineBeforeCursor.trim() === "") {
+			if (CSConfig.SEARCH_PHARSE_END.includes(textBeforeCursor.slice(-1)) || currLineBeforeCursor.trim() === "") {
 				let rs = null;
 
 				try {
 					// 这里需要做一个更好的截断
 					for (let i = currLineBeforeCursor.length - 1; i >= 0; i--) {
 						if (CSConfig.SERACH_CHINESE_END.includes(currLineBeforeCursor[i])) {
-							rs = await fetchLineCompletionTexts(currLineBeforeCursor.slice(i, -2), API_BASE, API_KEY, BOOK_ID);
+							rs = await fetchLineCompletionTexts(currLineBeforeCursor.slice(i, -1), API_BASE, API_KEY, BOOK_ID);
 							break;
 						}
 					}
 
 					if (rs == null) {
-						rs = await fetchLineCompletionTexts(currLineBeforeCursor.slice(0, -2), API_BASE, API_KEY, BOOK_ID);
+						rs = await fetchLineCompletionTexts(currLineBeforeCursor.slice(0, -1), API_BASE, API_KEY, BOOK_ID);
 					}
 
 					// rs = await fetchLineCompletionTexts(textBeforeCursor, API_BASE, API_KEY, BOOK_ID);
